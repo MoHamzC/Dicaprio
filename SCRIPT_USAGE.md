@@ -133,6 +133,8 @@ Le script vérifie automatiquement :
 | Port 443 déjà utilisé | `sudo lsof -i :443` |
 | Volumes corrompus | `make fclean && make` |
 | Certificat SSL non fiable | Normal (certificat auto-signé) |
+| MariaDB ne démarre pas | `docker-compose down -v && docker-compose build --no-cache` |
+| Secrets non lisibles | Reconstruction complète nécessaire |
 
 ## 🎯 Parfait pour 42
 

@@ -372,12 +372,19 @@ diagnostic() {
         success_log "Aucune erreur majeure dans les logs"
     fi
     
+    # Vérifier spécifiquement les problèmes MariaDB
+    if docker-compose -f srcs/docker-compose.yml logs mariadb | grep -q "Permission denied"; then
+        warning_log "Problème de permissions MariaDB détecté"
+        echo -e "${YELLOW}Solution: Reconstruire l'image MariaDB avec 'make fclean && make'${NC}"
+    fi
+    
     # Solutions communes
     echo -e "\n${BOLD}${PURPLE}Solutions communes:${NC}"
     echo -e "${YELLOW}• Permission denied sur Docker:${NC} newgrp docker"
     echo -e "${YELLOW}• Port déjà utilisé:${NC} sudo lsof -i :443"
     echo -e "${YELLOW}• Volumes corrompus:${NC} make fclean && make"
     echo -e "${YELLOW}• Certificat SSL non fiable:${NC} Normal pour un certificat auto-signé"
+    echo -e "${YELLOW}• MariaDB ne démarre pas:${NC} Reconstruction complète recommandée"
 }
 
 # Documentation et aide

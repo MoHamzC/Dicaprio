@@ -16,19 +16,19 @@ chown -R mysql:mysql /var/run/mysqld
 # Initialize database if not exists
 if [ ! -d "/var/lib/mysql/mysql" ]; then
     echo "Initializing database..."
-    su-exec mysql mysql_install_db --user=mysql --datadir=/var/lib/mysql
+    gosu mysql mysql_install_db --user=mysql --datadir=/var/lib/mysql
 
     # Start MariaDB temporarily as mysql user
-    su-exec mysql mysqld_safe --user=mysql --datadir=/var/lib/mysql --socket=/var/run/mysqld/mysqld.sock &
+    gosu mysql mysqld_safe --user=mysql --datadir=/var/lib/mysql --socket=/var/run/mysqld/mysqld.sock &
     sleep 5
 
     # Wait for MariaDB to start
-    while ! su-exec mysql mysqladmin ping --silent; do
+    while ! gosu mysql mysqladmin ping --silent; do
         sleep 1
     done
 
     # Set root password and create database
-    su-exec mysql mysql -u root <<-EOSQL
+    gosu mysql mysql -u root <<-EOSQL
         UPDATE mysql.user SET Password=PASSWORD('${DB_ROOT_PASSWORD}') WHERE User='root';
         DELETE FROM mysql.user WHERE User='';
         DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
@@ -41,8 +41,8 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 EOSQL
 
     # Stop temporary MariaDB
-    su-exec mysql mysqladmin -u root -p"${DB_ROOT_PASSWORD}" shutdown
+    gosu mysql mysqladmin -u root -p"${DB_ROOT_PASSWORD}" shutdown
 fi
 
 # Start MariaDB normally as mysql user
-exec su-exec mysql mysqld_safe --user=mysql --datadir=/var/lib/mysql
+exec gosu mysql mysqld_safe --user=mysql --datadir=/var/lib/mysql

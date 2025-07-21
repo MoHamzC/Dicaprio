@@ -1,10 +1,10 @@
 FROM debian:bullseye
 
-# Install MariaDB server and su-exec
+# Install MariaDB server and gosu
 RUN apt-get update && apt-get install -y \
     mariadb-server \
     mariadb-client \
-    su-exec \
+    gosu \
     && rm -rf /var/lib/apt/lists/*
 
 # Create necessary directories and set permissions
