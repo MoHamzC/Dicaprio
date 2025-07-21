@@ -162,7 +162,7 @@ EOF
     # Créer les dossiers secrets
     mkdir -p srcs/secrets
     
-    # Créer les fichiers secrets
+    # Créer les fichiers secrets (sans extension .txt)
     echo "root_password_123" > srcs/secrets/db_root_password
     echo "wp_password_123" > srcs/secrets/db_password
     cat > srcs/secrets/credentials << EOF
@@ -174,6 +174,19 @@ EOF
     
     chmod 600 srcs/secrets/*
     success_log "Secrets configurés"
+    
+    # Vérifier que tous les fichiers secrets existent
+    local missing_files=()
+    [ ! -f "srcs/secrets/db_root_password" ] && missing_files+=("db_root_password")
+    [ ! -f "srcs/secrets/db_password" ] && missing_files+=("db_password")
+    [ ! -f "srcs/secrets/credentials" ] && missing_files+=("credentials")
+    
+    if [ ${#missing_files[@]} -eq 0 ]; then
+        success_log "Tous les fichiers secrets sont présents"
+    else
+        error_log "Fichiers secrets manquants: ${missing_files[*]}"
+        return 1
+    fi
     
     # Créer les volumes Docker nommés
     docker volume create inception_mariadb_data || true
