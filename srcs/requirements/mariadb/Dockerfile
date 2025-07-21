@@ -1,9 +1,10 @@
 FROM debian:bullseye
 
-# Install MariaDB server
+# Install MariaDB server and su-exec
 RUN apt-get update && apt-get install -y \
     mariadb-server \
     mariadb-client \
+    su-exec \
     && rm -rf /var/lib/apt/lists/*
 
 # Create necessary directories and set permissions
@@ -24,8 +25,8 @@ RUN chown -R mysql:mysql /var/lib/mysql
 # Expose port
 EXPOSE 3306
 
-# Set user
-USER mysql
+# Don't set user here - we need root to read secrets first
+# USER mysql
 
-# Run initialization script
+# Run initialization script (will switch to mysql user internally)
 ENTRYPOINT ["/usr/local/bin/init_db.sh"]
